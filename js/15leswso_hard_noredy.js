@@ -67,12 +67,10 @@ class AppData{
 
     this.budget =  +salaryAmount.value;
     this.getExpInc();
-    this.getExpIncMonth(this.income);
-    this.getExpIncMonth(this.expenses);
-    // this.getAddExpenses();
-    // this.getAddIncome();
-    this.getAddExpInc(additionalExpensesItem);
-    this.getAddExpInc(additionalIncomeItem);
+    this.incomeMonth = this.getExpIncMonth(this.incomeMonth, this.income);
+    this.expensesMonth = this.getExpIncMonth(this.expensesMonth, this.expenses);
+    this.getAddExpInc(additionalExpensesItem, `addExpenses`);
+    this.getAddExpInc(additionalIncomeItem, `addIncome`);
     this.getBudget();    
     this.showResult();
 
@@ -116,6 +114,9 @@ class AppData{
     incomePlus.style.display = 'block';
     start.style.display = 'block';
     cancel.style.display = 'none';
+    document.querySelectorAll('input').forEach(item => {item.disabled =   '';});
+    document.querySelectorAll('.btn_plus').forEach(item => {item.removeAttribute('disabled');});
+    // this.eventListener();
   }
 
   removeInput(item){
@@ -170,24 +171,18 @@ class AppData{
 
 
   addExpInc(item){
-    // let item = this.who;
-    
     const cloneItem = document.querySelectorAll(`.${item}-items`)[0].cloneNode(true);
     let itemExpInc = document.querySelectorAll(`.${item}-items`);
-    let plusIncExp;
-    if(item === `expenses`){
-      plusIncExp = btnPlus[1];
-    }
-    if(item === `income`){
-      plusIncExp = btnPlus[0];
-    }
+    const btn = document.querySelector(`.${item}_add`);
+
     for(let i = 0; i< cloneItem.childNodes.length; i++){
       cloneItem.childNodes[i].value = '';
     }
-    itemExpInc[0].parentNode.insertBefore(cloneItem, plusIncExp);
+    
+    itemExpInc[0].parentNode.insertBefore(cloneItem, btn);
     itemExpInc = document.querySelectorAll(`.${item}-items`);
     if(itemExpInc.length === 3){
-      plusIncExp.style.display = 'none';
+      btn.style.display = 'none';
     }
     if(item === `expenses`){
       incomeItem = itemExpInc; 
@@ -244,8 +239,6 @@ class AppData{
         this.addExpenses.push(item);
       }
     });
-
-    
   }
 
   getAddIncome(){                  //возможный доход
@@ -258,54 +251,36 @@ class AppData{
   }
 
 
-  getAddExpInc(item){
-    debugger
-    if(item === additionalExpensesItem){item.value.split(', ');}
-    const startStr = item.className.split(/[_-]/)[1];
-    item.forEach((item) => {
-      if(item === additionalIncomeItem){item = item.value.trim();}
-      else{ item = item.trim();}
-      if(item !== ''){
-        this[startStr].push(item);
-      }
-    });
+  getAddExpInc(item, nameVar){
+    
+    let arr;
+
+    if(item.value){
+      arr = item.value.split(', ');
+    }else {
+      arr = item;
+    }if(arr.length > 0){
+      arr.forEach((item) => {
+          let result;
+        if(item.value && item.value !== ''){
+          result = item.value;
+        }if(typeof(item) === 'string' && item.trim() !== ''){
+          result = item;
+        }if(item !== '' && result !== undefined){ 
+          this[nameVar].push(result.toString().trim());
+        }
+      });
+    }
   }
 
-
-
-
-
-
-  // getExpensesMonth(){
-
-  //   for( let key in  this.expenses){
-  //     this.expensesMonth += +this.expenses[key];
-  //   }
-  // }
-
-  // getIncomeMonth(){
-
-  //   for(let key in this.income){
-  //     this.incomeMonth += +this.income[key];
-  //   }
-  // }
   
-
-  getExpIncMonth(item){
-    item = item;
-
-    let b = 0 ;
-
-    if(item === this.income){b = this.incomeMonth;}
-    if(item === this.expenses){b = this.expensesMonth;}
-
-    
-    for(let key in item){
-        b += +item[key];
-    }
-
-    if(item === this.income){this.incomeMonth=b;}
-    if(item === this.expenses){this.expensesMonth=b;}
+  
+  getExpIncMonth(item, arrItem){
+    for(let key in arrItem){
+          item += +arrItem[key];
+          
+      }
+      return item;
   }
 
 
@@ -339,10 +314,6 @@ class AppData{
   eventListener(){
     start.addEventListener('click', this.start.bind(this));
     cancel.addEventListener('click', this.cancel.bind(this));
-    // expensesPlus.addEventListener('click', this.addExpensesBlock.bind(this));
-    // incomePlus.addEventListener('click', this.addIncomeBlock.bind(this));
-    // expensesPlus.addEventListener('click', this.addExpInc.bind({...this, ...{who: 'expenses'}}));
-    // incomePlus.addEventListener('click', this.addExpInc.bind({...this, ...{who: 'income'}}));
     expensesPlus.addEventListener('click', function(){
       appData.addExpInc('expenses');
     });
@@ -353,26 +324,22 @@ class AppData{
       periodAmount.innerHTML = periodSelect.value;
     });
     this.inputCheckPlaceholder();
-    this.removeeventListener();
+    // this.removeeventListener();
   }
 
-  removeeventListener(){
-    start.removeEventListener('click', this.start.bind(this));
-    cancel.removeEventListener('click', this.cancel.bind(this));
-    // expensesPlus.removeEventListener('click', this.addExpensesBlock.bind(this));
-    // incomePlus.removeEventListener('click', this.addIncomeBlock.bind(this));
-    // expensesPlus.removeEventListener('click', this.addExpInc.bind({...this, ...{who: 'expenses'}}));
-    // incomePlus.removeEventListener('click', this.addExpInc.bind({...this, ...{who: 'income'}}));
-    expensesPlus.removeEventListener('click', function(){
-      appData.addExpInc('expenses');
-    });
-    incomePlus.removeEventListener('click', function(){
-      appData.addExpInc('income');
-    });
-    periodSelect.removeEventListener('input', function(){
-      periodAmount.innerHTML = periodSelect.value;
-    });
-  }
+  // removeeventListener(){
+  //   start.removeEventListener('click', this.start.bind(this));
+  //   cancel.removeEventListener('click', this.cancel.bind(this));
+  //   expensesPlus.removeEventListener('click', function(){
+  //     appData.addExpInc('expenses');
+  //   });
+  //   incomePlus.removeEventListener('click', function(){
+  //     appData.addExpInc('income');
+  //   });
+  //   periodSelect.removeEventListener('input', function(){
+  //     periodAmount.innerHTML = periodSelect.value;
+  //   });
+  // }
 
   inputCheckPlaceholder(){
     for(let i = 0; i < inputPlaceholder.length; i++){
