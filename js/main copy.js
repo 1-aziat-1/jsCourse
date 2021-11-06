@@ -78,10 +78,12 @@ class AppData{
 
     this.budget =  +salaryAmount.value;
     this.getExpInc();
-    this.incomeMonth = this.getExpIncMonth(this.incomeMonth, this.income);
-    this.expensesMonth = this.getExpIncMonth(this.expensesMonth, this.expenses);
-    this.getAddExpInc(additionalExpensesItem, `addExpenses`);
-    this.getAddExpInc(additionalIncomeItem, `addIncome`);
+    // this.getExpensesMonth();
+    // this.getIncomeMonth();
+    this.getExpIncMonth(this.income);
+    this.getExpIncMonth(this.expenses);
+    this.getAddExpenses();
+    this.getAddIncome();
     this.getInfoDeposit();
     this.getBudget();    
     this.showResult();
@@ -135,8 +137,6 @@ class AppData{
     start.style.display = 'block';
     cancel.style.display = 'none';
 
-    document.querySelectorAll('input').forEach(item => {item.disabled =   '';});
-    document.querySelectorAll('.btn_plus').forEach(item => {item.removeAttribute('disabled');});
     
     
   }
@@ -205,35 +205,56 @@ class AppData{
     expensesItems.forEach(count);
   }
 
-
-  getAddExpInc(item, nameVar){
-    
-    let arr;
-
-    if(item.value){
-      arr = item.value.split(', ');
-    }else {
-      arr = item;
-    }if(arr.length > 0){
-      arr.forEach((item) => {
-          let result;
-        if(item.value && item.value !== ''){
-          result = item.value;
-        }if(typeof(item) === 'string' && item.trim() !== ''){
-          result = item;
-        }if(item !== '' && result !== undefined){ 
-          this[nameVar].push(result.toString().trim());
-        }
-      });
-    }
+  getAddExpenses(){                   //возможные расходы 
+    let addExpenses = additionalExpensesItem.value.split(', ');
+    addExpenses.forEach((item) => {
+      item = item.trim();
+      if (item !== ''){
+        this.addExpenses.push(item);
+      }
+    });
   }
 
-  getExpIncMonth(item, arrItem){
-    for(let key in arrItem){
-          item += +arrItem[key];
-          
+  getAddIncome(){                  //возможный доход
+    additionalIncomeItem.forEach((item) => {  
+      let itemValue = item.value.trim();
+      if (itemValue !== ''){
+        this.addIncome.push(itemValue);
       }
-      return item;
+    });
+  }
+
+  // getExpensesMonth(){
+
+  //   for( let key in  this.expenses){
+  //     this.expensesMonth += +this.expenses[key];
+  //   }
+  // }
+
+  // getIncomeMonth(){
+
+  //   for(let key in this.income){
+  //     this.incomeMonth += +this.income[key];
+  //   }
+  // }
+
+
+
+  getExpIncMonth(item){
+    item = item;
+
+    let b = 0 ;
+
+    if(item === this.income){b = this.incomeMonth;}
+    if(item === this.expenses){b = this.expensesMonth;}
+
+    
+    for(let key in item){
+        b += +item[key];
+    }
+
+    if(item === this.income){this.incomeMonth=b;}
+    if(item === this.expenses){this.expensesMonth=b;}
   }
 
   getBudget(){

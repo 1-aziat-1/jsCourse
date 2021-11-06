@@ -116,7 +116,7 @@ class AppData{
     cancel.style.display = 'none';
     document.querySelectorAll('input').forEach(item => {item.disabled =   '';});
     document.querySelectorAll('.btn_plus').forEach(item => {item.removeAttribute('disabled');});
-    // this.eventListener();
+
   }
 
   removeInput(item){
